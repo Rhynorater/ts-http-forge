@@ -36,3 +36,8 @@ const modified = HttpForge.create(rawRequest)
 
 ### Body
 - `.body(body: string)` - Set the request body
+
+### Cookies
+- `.addCookie(name: string, value: string)` - Add a cookie
+- `.updateCookie(name: string, value: string)` - Add or update a cookie
+- `.deleteCookie(name: string)` - Remove a cookie
