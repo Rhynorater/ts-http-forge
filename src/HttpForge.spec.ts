@@ -71,8 +71,8 @@ Host: example.com
       const result = HttpForge.create(request)
         .addCookie("session", "abc123")
         .addCookie("user", "john")
-        .setCookie("session", "xyz789")
-        .removeCookie("user")
+        .updateCookie("session", "xyz789")
+        .deleteCookie("user")
         .build();
 
       expect(result).toBe(
@@ -93,7 +93,7 @@ Content-Type: application/json
         .method("PUT")
         .path("/api/v2/data")
         .addQueryParam("version", "2")
-        .setCookie("pref", "dark")
+        .updateCookie("pref", "dark")
         .setHeader("Authorization", "Bearer token")
         .body('{"updated":"data"}')
         .build();

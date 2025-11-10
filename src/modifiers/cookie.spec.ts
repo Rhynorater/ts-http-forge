@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { addCookie, setCookie, removeCookie } from "./cookie";
+import { addCookie, updateCookie, deleteCookie } from "./cookie";
 import type { HTTPRequestLines } from "../types";
 
 describe("addCookie", () => {
@@ -170,7 +170,7 @@ describe("addCookie", () => {
   });
 });
 
-describe("setCookie", () => {
+describe("updateCookie", () => {
   describe("valid input", () => {
     it("should set cookie when no Cookie header exists", () => {
       const lines: HTTPRequestLines = [
@@ -179,7 +179,7 @@ describe("setCookie", () => {
         "",
       ];
 
-      const result = setCookie(lines, "session", "abc123");
+      const result = updateCookie(lines, "session", "abc123");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -197,7 +197,7 @@ describe("setCookie", () => {
         "",
       ];
 
-      const result = setCookie(lines, "session", "xyz789");
+      const result = updateCookie(lines, "session", "xyz789");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -215,7 +215,7 @@ describe("setCookie", () => {
         "",
       ];
 
-      const result = setCookie(lines, "user", "john");
+      const result = updateCookie(lines, "user", "john");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -230,18 +230,18 @@ describe("setCookie", () => {
     it("should throw error when input is empty", () => {
       const lines: HTTPRequestLines = [];
 
-      expect(() => setCookie(lines, "session", "abc123")).toThrow("Request cannot be empty");
+      expect(() => updateCookie(lines, "session", "abc123")).toThrow("Request cannot be empty");
     });
 
     it("should throw error when cookie name is empty", () => {
       const lines: HTTPRequestLines = ["GET /path HTTP/1.1"];
 
-      expect(() => setCookie(lines, "", "value")).toThrow("Cookie name cannot be empty");
+      expect(() => updateCookie(lines, "", "value")).toThrow("Cookie name cannot be empty");
     });
   });
 });
 
-describe("removeCookie", () => {
+describe("deleteCookie", () => {
   describe("valid input", () => {
     it("should remove cookie from Cookie header", () => {
       const lines: HTTPRequestLines = [
@@ -251,7 +251,7 @@ describe("removeCookie", () => {
         "",
       ];
 
-      const result = removeCookie(lines, "session");
+      const result = deleteCookie(lines, "session");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -269,7 +269,7 @@ describe("removeCookie", () => {
         "",
       ];
 
-      const result = removeCookie(lines, "session");
+      const result = deleteCookie(lines, "session");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -286,7 +286,7 @@ describe("removeCookie", () => {
         "",
       ];
 
-      const result = removeCookie(lines, "user");
+      const result = deleteCookie(lines, "user");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -304,7 +304,7 @@ describe("removeCookie", () => {
         "",
       ];
 
-      const result = removeCookie(lines, "nonexistent");
+      const result = deleteCookie(lines, "nonexistent");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -321,7 +321,7 @@ describe("removeCookie", () => {
         "",
       ];
 
-      const result = removeCookie(lines, "session");
+      const result = deleteCookie(lines, "session");
 
       expect(result).toEqual([
         "GET /api/users HTTP/1.1",
@@ -338,8 +338,8 @@ describe("removeCookie", () => {
         "",
       ];
 
-      lines = removeCookie(lines, "user");
-      lines = removeCookie(lines, "theme");
+      lines = deleteCookie(lines, "user");
+      lines = deleteCookie(lines, "theme");
 
       expect(lines).toEqual([
         "GET /api/users HTTP/1.1",
@@ -354,19 +354,19 @@ describe("removeCookie", () => {
     it("should throw error when input is empty", () => {
       const lines: HTTPRequestLines = [];
 
-      expect(() => removeCookie(lines, "session")).toThrow("Request cannot be empty");
+      expect(() => deleteCookie(lines, "session")).toThrow("Request cannot be empty");
     });
 
     it("should throw error when cookie name is empty", () => {
       const lines: HTTPRequestLines = ["GET /path HTTP/1.1"];
 
-      expect(() => removeCookie(lines, "")).toThrow("Cookie name cannot be empty");
+      expect(() => deleteCookie(lines, "")).toThrow("Cookie name cannot be empty");
     });
 
     it("should throw error when cookie name is only whitespace", () => {
       const lines: HTTPRequestLines = ["GET /path HTTP/1.1"];
 
-      expect(() => removeCookie(lines, "   ")).toThrow("Cookie name cannot be empty");
+      expect(() => deleteCookie(lines, "   ")).toThrow("Cookie name cannot be empty");
     });
   });
 
@@ -374,7 +374,7 @@ describe("removeCookie", () => {
     it("should handle request with only request line", () => {
       const lines: HTTPRequestLines = ["GET /path HTTP/1.1"];
 
-      const result = removeCookie(lines, "session");
+      const result = deleteCookie(lines, "session");
 
       expect(result).toEqual(["GET /path HTTP/1.1"]);
     });
@@ -387,7 +387,7 @@ describe("removeCookie", () => {
         "",
       ];
 
-      const result = removeCookie(lines, "session");
+      const result = deleteCookie(lines, "session");
 
       expect(result.length).toBe(4);
     });
@@ -404,8 +404,8 @@ describe("cookie integration tests", () => {
 
     lines = addCookie(lines, "session", "abc123");
     lines = addCookie(lines, "user", "john");
-    lines = setCookie(lines, "session", "xyz789");
-    lines = removeCookie(lines, "user");
+    lines = updateCookie(lines, "session", "xyz789");
+    lines = deleteCookie(lines, "user");
 
     expect(lines).toEqual([
       "GET /api/users HTTP/1.1",
@@ -427,8 +427,8 @@ describe("cookie integration tests", () => {
     lines = addCookie(lines, "auth", "token123");
     lines = addCookie(lines, "pref", "light");
     lines = addCookie(lines, "lang", "en");
-    lines = setCookie(lines, "pref", "dark");
-    lines = removeCookie(lines, "lang");
+    lines = updateCookie(lines, "pref", "dark");
+    lines = deleteCookie(lines, "lang");
 
     expect(lines[3]).toBe("Cookie: auth=token123; pref=dark");
   });

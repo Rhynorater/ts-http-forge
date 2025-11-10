@@ -10,8 +10,8 @@ import {
   setBody,
   upsertQueryParam,
   addCookie,
-  setCookie,
-  removeCookie,
+  updateCookie,
+  deleteCookie,
 } from "./modifiers";
 import type { HttpMethod } from "./types";
 
@@ -85,13 +85,13 @@ export class HttpForge {
     return this;
   }
 
-  setCookie(name: string, value: string): this {
-    this.lines = setCookie(this.lines, name, value);
+  updateCookie(name: string, value: string): this {
+    this.lines = updateCookie(this.lines, name, value);
     return this;
   }
 
-  removeCookie(name: string): this {
-    this.lines = removeCookie(this.lines, name);
+  deleteCookie(name: string): this {
+    this.lines = deleteCookie(this.lines, name);
     return this;
   }
 
